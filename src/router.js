@@ -29,6 +29,22 @@ router.post('/accounts', (request, response, next) => {
 		.catch(next)
 })
 
+router.get('/accounts', (request, response, next) => {
+	const { allAccounts } = require('./queries/accounts')	
+	allAccounts()
+		.then( items => response.json({ items }))
+		.catch(next)
+})
+
+router.get('/accounts/:id', (request, response, next) => {
+	const { id } = request.params
+	const { accountById } = require('./queries/accounts')	
+	accountById({ id })
+		.then( account => response.json(account))
+		.catch(next)
+})
+
+
 
 router.get('*', (request, response) => response.status(404).json({ 
 	message: 'Здесь ничего нет' 

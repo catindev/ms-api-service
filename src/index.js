@@ -16,7 +16,7 @@ app.use(cookieParser())
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 
-app.use(require('./checkSession'))
+app.use(require('./session'))
 app.use(require('./router'))
 
 app.use((error, request, response, next) => {
