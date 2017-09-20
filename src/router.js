@@ -1,10 +1,8 @@
 const router = require('express').Router()
 
-router.get('/', (request, response) => {
-	const formatNumber = require('./utils/formatNumber')
-	const forHumans = require('./utils/formatNumberForHumans')
-	response.send(forHumans(formatNumber(request.query.number)))
-})
+router.get('/', (request, response) => response.json({ 
+	name: 'rpc-service', version: 1
+}))
 
 router.post('/sessions', (request, response, next) => {
 	const { login, password, type } = request.body
