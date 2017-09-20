@@ -1,6 +1,8 @@
+const CustomError = require('./error')
+
 function errorFor(phone) {
     return function(text) {
-        throw new Error(`${ phone } ${ text }`)
+        throw new CustomError(`${ phone } ${ text }`, 400)
     }
 }
 
@@ -15,18 +17,21 @@ module.exports = function formatNumber( phone, strict = true ) {
     if ( formatted[0] === '+' && formatted[1] === '7' ) 
         formatted = formatted.replace('+7','')
 
+    // warning! это условие пропускает номера в 7 цифр начинающихся с 8  
     if ( formatted[0] === '8' &&  formatted.length > 6) 
         formatted = formatted.replace('8','')
 
     formatted = formatted.replace(/\D/g,'')
 
-    if ( formatted.length > 10 ) 
+    const { length } = formatted
+
+    if ( length > 10 ) 
         return strict ? error('в номере лишние цифры (не больше 10)') : false
 
-    if ( formatted.length < 10 && formatted.length > 6) 
+    if ( length < 10 && length > 6) 
         return strict ? error('номер слишком короткий (больше 6, но меньше 10)') : false        
 
-    if ( formatted.length === 6 ) formatted = `7212${ formatted }`
+    if ( length === 6 ) formatted = `7212${ formatted }`
 
     return `+7${ formatted }`
 }

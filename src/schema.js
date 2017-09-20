@@ -3,12 +3,18 @@ const { Schema } = mongoose
 const { ObjectId } = Schema.Types
 const md5 = require('./utils/md5')
 
+function hidePassword( next ) {
+    if (!this.isModified('password')) return next()
+    this.password = md5(`${this.password}wow! much salt!`)
+    next()
+}
+
 const Log = mongoose.model('Log', new Schema({
+    level: String,
     who: { type: ObjectId, ref: 'Session' },
-    when: { type: Date, default: Date.now() },
+    when: { type: Date, expires: 1209600, default: Date.now() },
     what: String,
-    message: String,
-    type: String,
+    details: String,
 }))
 
 
@@ -37,23 +43,32 @@ const AdminSchema = new Schema({
  	access:{ type: String, default: 'admin' },
     created: { type: Date, default: Date.now() }
 })
-AdminSchema.pre('save', function( next ) {
-    if (!this.isModified('password')) return next()
-    this.password = md5(this.password + 'wow! much salt!')
-    next()
-})
+AdminSchema.pre('save', hidePassword)
 const Admin = mongoose.model('Admin', AdminSchema)
 
 
 const Session = mongoose.model('Session', new Schema({
-    account: { type: ObjectId, ref: 'Account' },
+    user: { type: ObjectId, ref: 'User' },
     admin: { type: ObjectId, ref: 'Admin' },    
     token: String,
-    type: String,
     created: { type: Date, default: Date.now() }
 }))
 
 
+const UserSchema = new Schema({
+    account: { type: ObjectId, ref: 'Account' },
+    created: { type: Date, default: Date.now() },
+    access: { type: String, enum: ['boss', 'manager'] },
+    name: String,
+    phones: [String],
+    email: String,
+    password: String
+})
+
+UserSchema.pre('save', hidePassword)
+const User = mongoose.model('User', UserSchema)
+
+
 module.exports = {
-	Log, Admin, Account, Session,
+	Log, Admin, Account, Session, User
 }
