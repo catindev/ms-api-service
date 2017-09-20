@@ -14,30 +14,9 @@ const app = express()
 
 app.use(cookieParser())
 app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: true }))
 
-app.use((request, response, next) => {
-	const { path, method } = request
-	if (path === '/sessions' && method === 'POST') return next()
-	if (path === '/' && method === 'GET') return next()
-
-	const { session } = request.cookies
-	const { session_token } = request.query
-	const { sessionID } = request.params
-
-	const token = session || session_token || sessionID
-
-	if (!token) return response.status(403).json({ 
-		error: 'Нет доступа. Авторизуйтесь' 
-	})
-
-	const { getTokenOwner } = require('./queries/sessions')	
-	getTokenOwner({ token })
-		.then(ownerID => {
-			next()
-		})
-		.catch(next)
-})
-
+app.use(require('./checkSession'))
 app.use(require('./router'))
 
 app.use((error, request, response, next) => {

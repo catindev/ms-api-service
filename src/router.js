@@ -20,21 +20,18 @@ router.post('/sessions', (request, response, next) => {
 })
 
 router.post('/accounts', (request, response, next) => {
-	const { login, password, type } = request.body
+	const { name } = request.body
+	const { userID } = request
 
-	if (!login || !password) return response.status(400).json({
-		message: 'Введите логин и пароль'
-	})
-
-	const { SignIn } = require('./queries/sessions')	
-	SignIn({ login, password, type })
-		.then(token => response.json({ token }))
+	const { createAccount } = require('./queries/accounts')	
+	createAccount({ name, author: userID })
+		.then(({ _id }) => response.json({ id: _id }))
 		.catch(next)
 })
 
 
-router.get('*', (request, response) => {
-	response.status(404).json({ message: 'Здесь ничего нет' })
-})
+router.get('*', (request, response) => response.status(404).json({ 
+	message: 'Здесь ничего нет' 
+}))
 
 module.exports = router
