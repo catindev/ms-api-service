@@ -12,7 +12,7 @@ module.exports = (request, response, next) => {
 	const token = session || sessionID || session_token
 
 	if (!token) return response.status(403).json({ 
-		error: 'Нет доступа. Авторизуйтесь' 
+		message: 'Нет доступа. Авторизуйтесь' 
 	})
 
 	getTokenOwner({ token })
