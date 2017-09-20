@@ -3,6 +3,15 @@ const { Schema } = mongoose
 const { ObjectId } = Schema.Types
 const md5 = require('./utils/md5')
 
+const Log = mongoose.model('Log', new Schema({
+    who: { type: ObjectId, ref: 'Session' },
+    when: { type: Date, default: Date.now() },
+    what: String,
+    message: String,
+    type: String,
+}))
+
+
 const Account = mongoose.model('Account', new Schema({
     name: String,
     maxWaitingTime: Number,
@@ -16,8 +25,15 @@ const Account = mongoose.model('Account', new Schema({
 
 
 const AdminSchema = new Schema({
-    login: String,
-    password: String,
+    login: {
+        type: String,
+        unique: true,
+        required: true
+    },
+    password: {
+        type: String,
+        required: true
+    },
  	access:{ type: String, default: 'admin' },
     created: { type: Date, default: Date.now() }
 })
@@ -39,5 +55,5 @@ const Session = mongoose.model('Session', new Schema({
 
 
 module.exports = {
-	Admin, Account, Session,
+	Log, Admin, Account, Session,
 }
