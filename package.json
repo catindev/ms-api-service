@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "nodemon src",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -16,5 +17,13 @@
   "bugs": {
     "url": "https://github.com/catindev/ms-rpc-service/issues"
   },
-  "homepage": "https://github.com/catindev/ms-rpc-service#readme"
+  "homepage": "https://github.com/catindev/ms-rpc-service#readme",
+  "dependencies": {
+    "body-parser": "^1.18.1",
+    "cookie-parser": "^1.4.3",
+    "ejs": "^2.5.7",
+    "express": "^4.15.4",
+    "mongoose": "^4.11.12",
+    "raven": "^2.1.2"
+  }
 }
