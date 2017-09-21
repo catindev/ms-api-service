@@ -1,10 +1,10 @@
 const router = require('express').Router()
 
 router.get('/', (request, response) => response.json({ 
-	name: 'rpc-service', version: 1
+	name: 'api-service', version: 1
 }))
 
-router.post('/sessions', (request, response, next) => {
+router.post('/session', (request, response, next) => {
 	const { login, password, type } = request.body
 
 	if (!login || !password) return response.status(400).json({
@@ -17,7 +17,15 @@ router.post('/sessions', (request, response, next) => {
 		.catch( error => { next(error) })
 })
 
-router.post('/accounts', (request, response, next) => {
+router.get('/session', (request, response, next) => {
+	const { getTokenOwner } = require('./queries/sessions')	
+	const { session_token } = request.query
+	getTokenOwner({ token: session_token })
+		.then(user => response.json(user))
+		.catch(next)
+})
+
+router.post('/account', (request, response, next) => {
 	const { name } = request.body
 	const { userID } = request
 
@@ -34,14 +42,13 @@ router.get('/accounts', (request, response, next) => {
 		.catch(next)
 })
 
-router.get('/accounts/:id', (request, response, next) => {
+router.get('/account/:id', (request, response, next) => {
 	const { id } = request.params
 	const { accountById } = require('./queries/accounts')	
 	accountById({ id })
 		.then( account => response.json(account))
 		.catch(next)
 })
-
 
 
 router.get('*', (request, response) => response.status(404).json({ 

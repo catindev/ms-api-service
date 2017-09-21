@@ -20,8 +20,8 @@ const Log = mongoose.model('Log', new Schema({
 
 const Account = mongoose.model('Account', new Schema({
     name: String,
-    maxWaitingTime: Number,
-    maxAnswerTime: Number,
+    maxWaitingTime: { type: Number, default: 12000 },
+    maxAnswerTime: { type: Number, default: 120000 },
     funnelSteps: [String],
     noTargetReasons: [String],
     targetQuestion: String,

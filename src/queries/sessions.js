@@ -39,20 +39,29 @@ async function SignOut({ token }) {
 
 
 function getTokenOwner({ token }) {
+
+	function removeSystemKeys(original) {
+		let replicant = JSON.parse(JSON.stringify(original))
+		replicant.id = original._id
+		delete replicant._id
+		delete replicant.password
+		delete replicant.__v
+		return replicant
+	}
+
 	const session = Session.findOne({ token })
 		.populate('user admin')
 		.exec()
-	
+
 	return session.then( data => {
 		if (data === null) throw new CustomError('Сессия не найдена', 403)
 
 		const { user, admin } = data
 
-		if (user) return user._id.toString()
+		if (user) return removeSystemKeys(user)
+		return removeSystemKeys(admin)	
 
-		return admin._id.toString()	
 	}).catch( error => { throw error })	
-
 }
 
 module.exports = { SignIn, SignOut, getTokenOwner }
