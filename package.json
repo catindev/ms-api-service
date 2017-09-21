@@ -1,5 +1,5 @@
 {
-  "name": "ms-rpc-service",
+  "name": "ms-api-service",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -9,15 +9,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/catindev/ms-rpc-service.git"
+    "url": "git+https://github.com/catindev/ms-api-service.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/catindev/ms-rpc-service/issues"
+    "url": "https://github.com/catindev/ms-api-service/issues"
   },
-  "homepage": "https://github.com/catindev/ms-rpc-service#readme",
+  "homepage": "https://github.com/catindev/ms-api-service#readme",
   "dependencies": {
     "body-parser": "^1.18.1",
     "cookie-parser": "^1.4.3",

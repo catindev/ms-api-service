@@ -38,7 +38,7 @@ router.post('/account', (request, response, next) => {
 router.get('/accounts', (request, response, next) => {
 	const { allAccounts } = require('./queries/accounts')	
 	allAccounts()
-		.then( items => response.json({ items }))
+		.then( items => response.json({ status: 200, items }))
 		.catch(next)
 })
 
