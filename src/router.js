@@ -6,6 +6,7 @@ const {
     accountById,
     updateAccount
 } = require('./queries/accounts')
+const { createUser } = require('./queries/users')
 
 
 router.get('/', (request, response) => response.json({
@@ -75,8 +76,18 @@ router.put('/account/:id', adminsOnly, (request, response, next) => {
         .catch(next)
 })
 
+router.post('/account/:accountID/user', adminsOnly, (request, response, next) => {
+    const { name } = request.body
+    const { accountID } = request.params
+    const { userID } = request
 
-router.get('*', (request, response) => response.status(404).json({
+    createUser({ name, userID, accountID })
+        .then(({ _id }) => response.json({ status: 200, id: _id }))
+        .catch(next)
+})
+
+
+router.all('*', (request, response) => response.status(404).json({
     status: 404,
     message: 'Здесь ничего нет'
 }))

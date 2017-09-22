@@ -6,7 +6,7 @@ module.exports = function isCurrentUserAdmin(request, response, next) {
         .then(admin => {
             if (admin === null) return response.status(403).json({
                 status: 403,
-                message: 'Нет доступа для этого действия'
+                message: 'У вас недостаточно прав доступа для этого действия'
             })
 
             next()

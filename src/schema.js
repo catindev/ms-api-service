@@ -21,7 +21,7 @@ const Log = mongoose.model('Log', new Schema({
 const Account = mongoose.model('Account', new Schema({
     name: String,
     maxWaitingTime: { type: Number, default: 12000 },
-    maxAnswerTime: { type: Number, default: 120000 },
+    maxConversationTime: { type: Number, default: 120000 },
     funnelSteps: [String],
     noTargetReasons: [String],
     targetQuestion: String,
@@ -40,7 +40,7 @@ const AdminSchema = new Schema({
         type: String,
         required: true
     },
- 	access:{ type: String, default: 'admin' },
+ 	access:{ type: String, enum: ['boss', 'manager'], default: 'admin',  },
     created: { type: Date, default: Date.now() }
 })
 AdminSchema.pre('save', hidePassword)
@@ -58,7 +58,7 @@ const Session = mongoose.model('Session', new Schema({
 const UserSchema = new Schema({
     account: { type: ObjectId, ref: 'Account' },
     created: { type: Date, default: Date.now() },
-    access: { type: String, enum: ['boss', 'manager'] },
+    access: { type: String, enum: ['boss', 'manager'], default: 'manager' },
     name: String,
     phones: [String],
     email: String,
