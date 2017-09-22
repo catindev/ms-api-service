@@ -1,14 +1,14 @@
 module.exports = function formatNumberForHumans(number) {
     if (!number) return false
 
-    if (number.length < 6) return `${ number.replace('+7', '') }`    
-    
+    if (number.length < 6) return `${ number.replace('+7', '') }`
+
     const re = /(?:([\d]{1,}?))??(?:([\d]{1,3}?))??(?:([\d]{1,3}?))??(?:([\d]{2}))??([\d]{2})$/
     let formatted = (number.replace(re,
-        (all, a, b, c, d, e) => (a ? a + ' ' : '') + 
-                                (b ? b + ' ' : '') + 
-                                (c ? c + '-' : '') + 
-                                (d ? d + '-' : '') + e
+        (all, a, b, c, d, e) => (a ? a + ' ' : '') +
+        (b ? b + ' ' : '') +
+        (c ? c + '-' : '') +
+        (d ? d + '-' : '') + e
     )).split(' ')
 
     if (formatted[1] === '727') {

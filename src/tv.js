@@ -5,6 +5,6 @@ mongoose.connection.openUri('mongodb://localhost/ms3')
 
 const { createAdmin } = require('./queries/admins')
 
-createAdmin({ login: 'tv', password: '14005000' })
+createAdmin({ login: 'test', password: '111', access: 'partner' })
 	.then( console.log )
 	.catch( console.log )
