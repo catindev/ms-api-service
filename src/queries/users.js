@@ -1,6 +1,6 @@
 const toObjectId = require('mongoose').Types.ObjectId
 const { Admin, User, Account } = require('../schema')
-const { isAuthor } = require('./accounts')
+const { isAccountAuthor } = require('./accounts')
 const CustomError = require('../utils/error')
 
 
@@ -8,7 +8,7 @@ async function createUser({ accountID, userID, name }) {
 	if (typeof accountID === 'string') accountID = toObjectId(accountID)
 	if (typeof userID === 'string') userID = toObjectId(userID)
 
-	const canCreate = await isAuthor({ userID, accountID })
+	const canCreate = await isAccountAuthor({ userID, accountID })
 	if (canCreate === false) 
 		throw new CustomError('У вас недостаточно прав доступа для этого действия', 403)
 
@@ -16,5 +16,9 @@ async function createUser({ accountID, userID, name }) {
 	return newUser.save()		
 }
 
+function getUserById() {
 
-module.exports = { createUser, isAuthor }
+}
+
+
+module.exports = { createUser }

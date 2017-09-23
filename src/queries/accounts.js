@@ -1,53 +1,65 @@
 const toObjectId = require('mongoose').Types.ObjectId
 const { Account, Admin } = require('../schema')
+const CustomError = require('../utils/error')
 
 function createAccount({ name, author }) {
-	const newAccount = new Account({ name, author });
-	return newAccount.save()
+    const newAccount = new Account({ name, author });
+    return newAccount.save()
 }
 
-async function updateAccount({ userID, _id, data }) {
-	if (typeof adminID === 'string') adminID = toObjectId(adminID)
+async function updateAccount({ userID, accountID, data }) {
+    if (typeof accountID === 'string') accountID = toObjectId(accountID)
+    if (typeof userID === 'string') userID = toObjectId(userID)
 
-	const admin = await Admin.findOne({ _id: adminID })
+    const admin = await Admin.findOne({ _id: userID })
 
-	const query = admin.access === 'partner' ?
-		{ _id, author: adminID }
-		:
-		{ _id }
+    const query = admin.access === 'partner' ? { _id: accountID, author: userID } : { _id: accountID }
 
-	return Account.update(query, data)
+    return Account.update(query, data)
 }
 
 async function allAccounts({ userID, query = {} }) {
-	const admin = await Admin.findOne({ _id: toObjectId(userID) })
-	
-	if (admin.access === 'partner') query.author = admin._id
+    if (typeof userID === 'string') userID = toObjectId(userID)
 
-	return await Account.find(query, { name: 1 })
-		.then(accounts => {
-				if (accounts && accounts.length > 0) 
-					return accounts.map(({_id, name}) => ({ id: _id, name }))
-				return accounts
-			})
+    const admin = await Admin.findOne({ _id: userID })
+
+    if (admin.access === 'partner') query.author = admin._id
+
+    const accounts = await Account.find(query, { name: 1 })
+
+    if (accounts && accounts.length > 0)
+        return accounts.map(({ _id, name }) => ({ id: _id, name }))
+
+    return accounts
 }
 
-function accountById({ id }) {
-	return Account.findOne({ _id: toObjectId(id) })	
+async function accountById({ userID, accountID }) {
+    if (typeof accountID === 'string') accountID = toObjectId(accountID)
+    if (typeof userID === 'string') userID = toObjectId(userID)
+
+    const admin = await Admin.findOne({ _id: userID })
+    const query = admin.access === 'partner' ? 
+        { _id: accountID, author: userID } : { _id: accountID }
+
+    return Account.findOne(query, { __v: false })
 }
 
-async function isAuthor({ userID, accountID }) {
-	if (typeof accountID === 'string') accountID = toObjectId(accountID)
-	if (typeof userID === 'string') userID = toObjectId(userID)
+async function isAccountAuthor({ userID, accountID }) {
+    if (typeof accountID === 'string') accountID = toObjectId(accountID)
+    if (typeof userID === 'string') userID = toObjectId(userID)
 
-	const admin = await Admin.findOne({ _id: userID })
-	if (admin && admin.access === 'admin') return true
+    const admin = await Admin.findOne({ _id: userID })
+    if (admin && admin.access === 'admin') return true
 
-	const isAccount = await Account.findOne({ _id: accountID, author: userID })
-	return isAccount === null ? false : true
+    const isAccount = await Account.findOne({ _id: accountID, author: userID })
+    return isAccount === null ? false : true
 }
 
 
-module.exports = { 
-	createAccount, updateAccount, allAccounts, accountById, isAuthor
+module.exports = {
+    createAccount,
+    updateAccount,
+    allAccounts,
+    accountById,
+    isAccountAuthor
 }

@@ -1,8 +1,8 @@
 const { adminById } = require('../queries/admins')
 
 module.exports = function isCurrentUserAdmin(request, response, next) {
-
-    adminById({ _id: request.userID })
+	const { userID } = request
+    adminById({ userID })
         .then(admin => {
             if (admin === null) return response.status(403).json({
                 status: 403,

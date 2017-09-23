@@ -6,9 +6,9 @@ function createAdmin(data) {
 	return newAdmin.save()
 }
 
-function adminById({ _id }) {
-	if (typeof _id === 'string') _id = toObjectId(_id)
-	return Admin.findOne({ _id })
+function adminById({ userID }) {
+	if (typeof userID === 'string') userID = toObjectId(userID)
+	return Admin.findOne({ _id: userID }, { __v: false, password: false })
 }
 
 

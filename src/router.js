@@ -57,21 +57,30 @@ router.get('/accounts', adminsOnly, (request, response, next) => {
         .catch(next)
 })
 
-router.get('/account/:id', (request, response, next) => {
-    const { id } = request.params
+router.get('/account/:accountID', adminsOnly, (request, response, next) => {
+    const { accountID } = request.params
+    const { userID } = request
 
-    accountById({ id })
-        .then(account => response.json(
-            Object.assign({ status: 200 }, account.toJSON())
-        ))
+    // TODO: дату создания в ЧПВ
+    accountById({ userID, accountID })
+        .then(account => {
+            if (account === null) return response.status(404)
+                .json({ status: 404, message: 'Аккаунт не найден' })
+
+        	let acc = account.toJSON()
+        	const id = acc._id
+        	delete acc._id
+
+        	response.json(Object.assign({ status: 200, id }, acc))
+        })
         .catch(next)
 })
 
-router.put('/account/:id', adminsOnly, (request, response, next) => {
-	const { id } = request.params
+router.put('/account/:accountID', adminsOnly, (request, response, next) => {
+	const { accountID } = request.params
     const { body, userID } = request
 
-    updateAccount({ userID, _id: id, data: body })
+    updateAccount({ userID, accountID, data: body })
         .then(() => response.json({ status: 200 }))
         .catch(next)
 })

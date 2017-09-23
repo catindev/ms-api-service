@@ -38,7 +38,7 @@ async function SignOut({ token }) {
 }
 
 
-function getTokenOwner({ token }) {
+async function getTokenOwner({ token }) {
 
 	function removeSystemKeys(original) {
 		let replicant = JSON.parse(JSON.stringify(original))
@@ -47,19 +47,16 @@ function getTokenOwner({ token }) {
 		return replicant
 	}
 
-	const session = Session.findOne({ token })
+	const session = await Session.findOne({ token })
 		.populate('user admin')
 		.exec()
+		
+	if (session === null) throw new CustomError('Сессия не найдена', 403)
 
-	return session.then( data => {
-		if (data === null) throw new CustomError('Сессия не найдена', 403)
+	const { user, admin } = session
 
-		const { user, admin } = data
-
-		if (user) return removeSystemKeys(user)
-		return removeSystemKeys(admin)	
-
-	}).catch( error => { throw error })	
+	if (user) return removeSystemKeys(user)
+	return removeSystemKeys(admin)		
 }
 
 module.exports = { SignIn, SignOut, getTokenOwner }
