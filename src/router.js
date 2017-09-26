@@ -6,7 +6,7 @@ const {
     accountById,
     updateAccount
 } = require('./queries/accounts')
-const { createUser } = require('./queries/users')
+const { createUser, userById } = require('./queries/users')
 
 
 router.get('/', (request, response) => response.json({
@@ -30,11 +30,12 @@ router.post('/session', (request, response, next) => {
 router.get('/session', (request, response, next) => {
     const { getTokenOwner } = require('./queries/sessions')
     const { session_token } = request.query
+     
     getTokenOwner({ token: session_token })
         .then(user => {
-            user.id = user._id
+            const id = user._id
             delete user._id
-            response.json(Object.assign({ status: 200 }, user))
+            response.json(Object.assign({ status: 200, id }, user))
         })
         .catch(next)
 })
@@ -61,15 +62,21 @@ router.get('/account/:accountID', adminsOnly, (request, response, next) => {
     const { accountID } = request.params
     const { userID } = request
 
+    const moment = require('moment')
+    moment.locale('ru')
+
     // TODO: дату создания в ЧПВ
     accountById({ userID, accountID })
         .then(account => {
             if (account === null) return response.status(404)
                 .json({ status: 404, message: 'Аккаунт не найден' })
 
-        	let acc = account.toJSON()
+        	const acc = account.toJSON()
         	const id = acc._id
         	delete acc._id
+
+            acc.author = acc.author.login
+            acc.created = moment(acc.created).format('DD MMMM в HH:mm')
 
         	response.json(Object.assign({ status: 200, id }, acc))
         })
@@ -95,6 +102,23 @@ router.post('/account/:accountID/user', adminsOnly, (request, response, next) =>
         .catch(next)
 })
 
+router.get('/account/:accountID/user/:userID', adminsOnly, (request, response, next) => {
+    const { accountID, userID } = request.params
+    const adminID = request.userID
+
+    userById({ adminID, userID, accountID })
+        .then(user => {
+            if (user === null) return response.status(404)
+                .json({ status: 404, message: 'Учётная запись не найдена' })
+
+            const usr = account.toJSON()
+            const id = usr._id
+            delete usr._id
+
+            response.json(Object.assign({ status: 200, id }, usr))
+        })
+        .catch(next)
+})
 
 router.all('*', (request, response) => response.status(404).json({
     status: 404,

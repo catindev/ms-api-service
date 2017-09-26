@@ -13,7 +13,8 @@ async function updateAccount({ userID, accountID, data }) {
 
     const admin = await Admin.findOne({ _id: userID })
 
-    const query = admin.access === 'partner' ? { _id: accountID, author: userID } : { _id: accountID }
+    const query = admin.access === 'partner' ? 
+        { _id: accountID, author: userID } : { _id: accountID }
 
     return Account.update(query, data)
 }
@@ -41,7 +42,10 @@ async function accountById({ userID, accountID }) {
     const query = admin.access === 'partner' ? 
         { _id: accountID, author: userID } : { _id: accountID }
 
+    // TODO: имя автора     
     return Account.findOne(query, { __v: false })
+            .populate('author')
+            .exec()
 }
 
 async function isAccountAuthor({ userID, accountID }) {

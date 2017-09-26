@@ -16,9 +16,21 @@ async function createUser({ accountID, userID, name }) {
 	return newUser.save()		
 }
 
-function getUserById() {
+async function userById({ adminID, accountID, userID }) {
+    if (typeof accountID === 'string') accountID = toObjectId(accountID)
+    if (typeof userID === 'string') userID = toObjectId(userID)
+    if (typeof adminID === 'string') adminID = toObjectId(adminID)	
 
+    const admin = await Admin.findOne({ _id: adminID })
+	const query = admin.access === 'partner' ? 
+        { _id: accountID, author: adminID } : { _id: accountID }
+
+    const account = await Account.findOne(query)
+    if (account === null) return account
+
+
+    return User.findOne({ _id: userID }, { __v: false, password: false })	
 }
 
 
-module.exports = { createUser }
+module.exports = { createUser, userById }
