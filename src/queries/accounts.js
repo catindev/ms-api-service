@@ -28,10 +28,7 @@ async function allAccounts({ userID, query = {} }) {
 
     const accounts = await Account.find(query, { name: 1 })
 
-    if (accounts && accounts.length > 0)
-        return accounts.map(({ _id, name }) => ({ id: _id, name }))
-
-    return accounts
+    if (accounts && accounts.length > 0) return accounts
 }
 
 async function accountById({ userID, accountID }) {

@@ -6,7 +6,7 @@ const {
     accountById,
     updateAccount
 } = require('./queries/accounts')
-const { createUser, userById } = require('./queries/users')
+const { createUser, userById, allUsers } = require('./queries/users')
 
 
 router.get('/', (request, response) => response.json({
@@ -54,7 +54,9 @@ router.get('/accounts', adminsOnly, (request, response, next) => {
     const { userID } = request
 
     allAccounts({ userID })
-        .then(items => response.json({ status: 200, items }))
+        .then(items => response.json({ 
+            status: 200, items: items.map(({ _id, name }) => ({ id: _id, name })) 
+        }))
         .catch(next)
 })
 
@@ -76,7 +78,7 @@ router.get('/account/:accountID', adminsOnly, (request, response, next) => {
         	delete acc._id
 
             acc.author = acc.author.login
-            acc.created = moment(acc.created).format('DD MMMM в HH:mm')
+            acc.created = moment(acc.created).format('DD MMMM')
 
         	response.json(Object.assign({ status: 200, id }, acc))
         })
@@ -117,6 +119,21 @@ router.get('/account/:accountID/user/:userID', adminsOnly, (request, response, n
 
             response.json(Object.assign({ status: 200, id }, usr))
         })
+        .catch(next)
+})
+
+router.get('/account/:accountID/users', adminsOnly, (request, response, next) => {
+    const { accountID, userID } = request.params
+    const adminID = request.userID
+
+    allUsers({ adminID, userID, accountID })
+        .then(items => response.json({ 
+            status: 200, 
+            items: items ? 
+                items.map(({ _id, name }) => ({ id: _id, name })) 
+                :
+                []
+        }))
         .catch(next)
 })
 

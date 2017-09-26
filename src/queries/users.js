@@ -28,9 +28,27 @@ async function userById({ adminID, accountID, userID }) {
     const account = await Account.findOne(query)
     if (account === null) return account
 
-
     return User.findOne({ _id: userID }, { __v: false, password: false })	
 }
 
+async function allUsers({ adminID, accountID, userID, query = {} }) {
+    if (typeof accountID === 'string') accountID = toObjectId(accountID)
+    if (typeof userID === 'string') userID = toObjectId(userID)
+    if (typeof adminID === 'string') adminID = toObjectId(adminID)
 
-module.exports = { createUser, userById }
+    const admin = await Admin.findOne({ _id: adminID })
+	const accountQuery = admin.access === 'partner' ? 
+        { _id: accountID, author: adminID } : { _id: accountID }
+
+    const accounts = await Account.find(accountQuery, { name: 1 })
+
+    if (accounts && accounts.length > 0) {
+    	const usersQuery = Object.assign({ account: accountID }, query)
+    	return User.find(usersQuery, { name: 1 })
+    }
+
+    return []	
+}
+
+
+module.exports = { createUser, userById, allUsers }
