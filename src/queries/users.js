@@ -42,10 +42,10 @@ async function allUsers({ adminID, accountID, userID, query = {} }) {
 
     const accounts = await Account.find(accountQuery, { name: 1 })
 
-    if (accounts && accounts.length > 0) {
-    	const usersQuery = Object.assign({ account: accountID }, query)
-    	return User.find(usersQuery, { name: 1 })
-    }
+    if (accounts && accounts.length > 0) return User.find(
+			Object.assign({ account: accountID }, query),
+			{ name: 1 }
+		)
 
     return []	
 }
