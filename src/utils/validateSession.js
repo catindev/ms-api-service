@@ -6,10 +6,9 @@ module.exports = (request, response, next) => {
     if (path === '/' && method === 'GET') return next()
 
     const { session } = request.cookies
-    const { sessionToken } = request.params
     const { session_token } = request.query
 
-    const token = session || sessionToken || session_token
+    const token = session || session_token
 
     if (!token) return response.status(403).json({
         status: 403,

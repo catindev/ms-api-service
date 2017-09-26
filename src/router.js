@@ -14,7 +14,7 @@ router.get('/', (request, response) => response.json({
     version: 1
 }))
 
-router.post('/session', (request, response, next) => {
+router.post('/sessions', (request, response, next) => {
     const { login, password, type } = request.body
 
     if (!login || !password) return response.status(400).json({
@@ -27,7 +27,7 @@ router.post('/session', (request, response, next) => {
         .catch(error => { next(error) })
 })
 
-router.get('/session', (request, response, next) => {
+router.get('/sessions', (request, response, next) => {
     const { getTokenOwner } = require('./queries/sessions')
     const { session_token } = request.query
      
@@ -40,7 +40,7 @@ router.get('/session', (request, response, next) => {
         .catch(next)
 })
 
-router.post('/account', adminsOnly, (request, response, next) => {
+router.post('/accounts', adminsOnly, (request, response, next) => {
     const { name } = request.body
     const { userID } = request
 
@@ -60,7 +60,7 @@ router.get('/accounts', adminsOnly, (request, response, next) => {
         .catch(next)
 })
 
-router.get('/account/:accountID', adminsOnly, (request, response, next) => {
+router.get('/accounts/:accountID', adminsOnly, (request, response, next) => {
     const { accountID } = request.params
     const { userID } = request
 
@@ -85,7 +85,7 @@ router.get('/account/:accountID', adminsOnly, (request, response, next) => {
         .catch(next)
 })
 
-router.put('/account/:accountID', adminsOnly, (request, response, next) => {
+router.put('/accounts/:accountID', adminsOnly, (request, response, next) => {
 	const { accountID } = request.params
     const { body, userID } = request
 
@@ -94,7 +94,7 @@ router.put('/account/:accountID', adminsOnly, (request, response, next) => {
         .catch(next)
 })
 
-router.post('/account/:accountID/user', adminsOnly, (request, response, next) => {
+router.post('/accounts/:accountID/users', adminsOnly, (request, response, next) => {
     const { name } = request.body
     const { accountID } = request.params
     const { userID } = request
@@ -104,7 +104,7 @@ router.post('/account/:accountID/user', adminsOnly, (request, response, next) =>
         .catch(next)
 })
 
-router.get('/account/:accountID/user/:userID', adminsOnly, (request, response, next) => {
+router.get('/accounts/:accountID/users/:userID', adminsOnly, (request, response, next) => {
     const { accountID, userID } = request.params
     const adminID = request.userID
 
@@ -122,7 +122,7 @@ router.get('/account/:accountID/user/:userID', adminsOnly, (request, response, n
         .catch(next)
 })
 
-router.get('/account/:accountID/users', adminsOnly, (request, response, next) => {
+router.get('/accounts/:accountID/users', adminsOnly, (request, response, next) => {
     const { accountID, userID } = request.params
     const adminID = request.userID
 
