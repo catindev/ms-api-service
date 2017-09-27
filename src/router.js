@@ -1,14 +1,9 @@
 const router = require('express').Router()
 const adminsOnly = require('./utils/isAdmin')
-const {
-    createAccount,
-    allAccounts,
-    accountById,
-    updateAccount
-} = require('./queries/accounts')
-const { createUser, userById, allUsers } = require('./queries/users')
+const { createAccount, allAccounts, accountById, updateAccount } = require('./queries/accounts')
+const { createUser, userById, allUsers, updateUser } = require('./queries/users')
 
-
+// TODO: страничка с доками для авторизованного админа
 router.get('/', (request, response) => response.json({
     name: 'api-service',
     version: 1
@@ -70,7 +65,8 @@ router.get('/accounts/:accountID', adminsOnly, (request, response, next) => {
     // TODO: дату создания в ЧПВ
     accountById({ userID, accountID })
         .then(account => {
-            if (account === null) return response.status(404)
+            if (account === null) return response
+                .status(404)
                 .json({ status: 404, message: 'Аккаунт не найден' })
 
         	const acc = account.toJSON()
@@ -104,24 +100,6 @@ router.post('/accounts/:accountID/users', adminsOnly, (request, response, next) 
         .catch(next)
 })
 
-router.get('/accounts/:accountID/users/:userID', adminsOnly, (request, response, next) => {
-    const { accountID, userID } = request.params
-    const adminID = request.userID
-
-    userById({ adminID, userID, accountID })
-        .then(user => {
-            if (user === null) return response.status(404)
-                .json({ status: 404, message: 'Учётная запись не найдена' })
-
-            const usr = account.toJSON()
-            const id = usr._id
-            delete usr._id
-
-            response.json(Object.assign({ status: 200, id }, usr))
-        })
-        .catch(next)
-})
-
 router.get('/accounts/:accountID/users', adminsOnly, (request, response, next) => {
     const { accountID, userID } = request.params
     const adminID = request.userID
@@ -134,6 +112,34 @@ router.get('/accounts/:accountID/users', adminsOnly, (request, response, next) =
                 :
                 []
         }))
+        .catch(next)
+})
+
+router.get('/accounts/:accountID/users/:userID', adminsOnly, (request, response, next) => {
+    const { accountID, userID } = request.params
+    const adminID = request.userID
+
+    userById({ adminID, userID, accountID })
+        .then(user => {
+            if (user === null) return response
+                .status(404)
+                .json({ status: 404, message: 'Учётная запись не найдена' })
+
+            const usr = user.toJSON()
+            const id = usr._id
+            delete usr._id
+
+            response.json(Object.assign({ status: 200, id }, usr))
+        })
+        .catch(next)
+})
+
+router.put('/accounts/:accountID/users/:userID', adminsOnly, (request, response, next) => {
+    const { accountID, userID } = request.params
+    const adminID = request.userID
+
+    updateUser({ adminID, userID, accountID, data: request.body })
+        .then(() => response.json({ status: 200 }))
         .catch(next)
 })
 

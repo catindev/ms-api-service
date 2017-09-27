@@ -1,14 +1,13 @@
 const toObjectId = require('mongoose').Types.ObjectId
 const { Admin, User, Account } = require('../schema')
-const { isAccountAuthor } = require('./accounts')
+const { haveAccessToAccount } = require('./accounts')
 const CustomError = require('../utils/error')
-
 
 async function createUser({ accountID, userID, name }) {
     if (typeof accountID === 'string') accountID = toObjectId(accountID)
     if (typeof userID === 'string') userID = toObjectId(userID)
 
-    const canCreate = await isAccountAuthor({ userID, accountID })
+    const canCreate = await haveAccessToAccount({ admin: userID, account: accountID })
     if (canCreate === false)
         throw new CustomError('У вас недостаточно прав доступа для этого действия', 403)
 
@@ -21,11 +20,9 @@ async function userById({ adminID, accountID, userID }) {
     if (typeof userID === 'string') userID = toObjectId(userID)
     if (typeof adminID === 'string') adminID = toObjectId(adminID)
 
-    const admin = await Admin.findOne({ _id: adminID })
-    const query = admin.access === 'partner' ? { _id: accountID, author: adminID } : { _id: accountID }
-
-    const account = await Account.findOne(query)
-    if (account === null) return account
+    const canFetch = await haveAccessToAccount({ admin: adminID, account: accountID })	
+	if (canFetch === false)
+        throw new CustomError('У вас недостаточно прав доступа для этого действия', 403)
 
     return User.findOne({ _id: userID }, { __v: false, password: false })
 }
@@ -35,18 +32,26 @@ async function allUsers({ adminID, accountID, userID, query = {} }) {
     if (typeof userID === 'string') userID = toObjectId(userID)
     if (typeof adminID === 'string') adminID = toObjectId(adminID)
 
-    const admin = await Admin.findOne({ _id: adminID })
-    const accountQuery = admin.access === 'partner' ? 
-    	{ _id: accountID, author: adminID } : { _id: accountID }
+    const canFetch = await haveAccessToAccount({ admin: adminID, account: accountID })	
+	if (canFetch === false)
+        throw new CustomError('У вас недостаточно прав доступа для этого действия', 403)
 
-    const accounts = await Account.find(accountQuery, { name: 1 })
-
-    if (accounts && accounts.length > 0) return User.find(
+    return User.find(
         Object.assign({ account: accountID }, query), { name: 1 }
     )
+}
 
-    return []
+async function updateUser({ adminID, accountID, userID, data }) {
+    if (typeof accountID === 'string') accountID = toObjectId(accountID)
+    if (typeof userID === 'string') userID = toObjectId(userID)
+    if (typeof adminID === 'string') adminID = toObjectId(adminID)
+
+    const canUpdate = await haveAccessToAccount({ admin: adminID, account: accountID })  
+    if (canUpdate === false)
+        throw new CustomError('У вас недостаточно прав доступа для этого действия', 403)
+
+    return User.update({ _id: userID }, data)
 }
 
 
-module.exports = { createUser, userById, allUsers }
+module.exports = { createUser, userById, allUsers, updateUser }

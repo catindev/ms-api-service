@@ -2,6 +2,7 @@ const { adminById } = require('../queries/admins')
 
 module.exports = function isCurrentUserAdmin(request, response, next) {
 	const { userID } = request
+    
     adminById({ userID })
         .then(admin => {
             if (admin === null) return response.status(403).json({

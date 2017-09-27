@@ -38,21 +38,20 @@ async function accountById({ userID, accountID }) {
     const admin = await Admin.findOne({ _id: userID })
     const query = admin.access === 'partner' ? 
         { _id: accountID, author: userID } : { _id: accountID }
-
-    // TODO: имя автора     
+            
     return Account.findOne(query, { __v: false })
             .populate('author')
             .exec()
 }
 
-async function isAccountAuthor({ userID, accountID }) {
-    if (typeof accountID === 'string') accountID = toObjectId(accountID)
-    if (typeof userID === 'string') userID = toObjectId(userID)
+async function haveAccessToAccount({ admin, account }) {
+    if (typeof account === 'string') account = toObjectId(account)
+    if (typeof admin === 'string') admin = toObjectId(admin)
 
-    const admin = await Admin.findOne({ _id: userID })
-    if (admin && admin.access === 'admin') return true
+    const { access } = await Admin.findOne({ _id: admin })
+    if (access && access === 'admin') return true
 
-    const isAccount = await Account.findOne({ _id: accountID, author: userID })
+    const isAccount = await Account.findOne({ _id: account, author: admin })
     return isAccount === null ? false : true
 }
 
@@ -62,5 +61,5 @@ module.exports = {
     updateAccount,
     allAccounts,
     accountById,
-    isAccountAuthor
+    haveAccessToAccount
 }
