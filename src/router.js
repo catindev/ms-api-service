@@ -48,8 +48,9 @@ router.get('/accounts',  (request, response, next) => {
     const { userID } = request
 
     allAccounts({ userID })
-        .then(items => response.json({ 
-            status: 200, items: items.map(({ _id, name }) => ({ id: _id, name })) 
+        .then((items = []) => response.json({ 
+            status: 200, 
+            items: items.map(({ _id, name }) => ({ id: _id, name })) 
         }))
         .catch(next)
 })
