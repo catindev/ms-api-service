@@ -1,5 +1,4 @@
 const router = require('express').Router()
-const adminsOnly = require('./utils/isAdmin')
 const { createAccount, allAccounts, accountById, updateAccount } = require('./queries/accounts')
 const { createUser, userById, allUsers, updateUser } = require('./queries/users')
 
@@ -10,14 +9,14 @@ router.get('/', (request, response) => response.json({
 }))
 
 router.post('/sessions', (request, response, next) => {
-    const { login, password, type } = request.body
+    const { login, password } = request.body
 
     if (!login || !password) return response.status(400).json({
         message: 'Введите логин и пароль'
     })
 
     const { SignIn } = require('./queries/sessions')
-    SignIn({ login, password, type })
+    SignIn({ login, password })
         .then(token => response.json({ status: 200, token }))
         .catch(error => { next(error) })
 })
@@ -35,7 +34,7 @@ router.get('/sessions', (request, response, next) => {
         .catch(next)
 })
 
-router.post('/accounts', adminsOnly, (request, response, next) => {
+router.post('/accounts', (request, response, next) => {
     const { name } = request.body
     const { userID } = request
 
@@ -44,7 +43,7 @@ router.post('/accounts', adminsOnly, (request, response, next) => {
         .catch(next)
 })
 
-router.get('/accounts', adminsOnly, (request, response, next) => {
+router.get('/accounts',  (request, response, next) => {
     // TODO: потестить на юзере из ЦРМ
     const { userID } = request
 
@@ -55,7 +54,7 @@ router.get('/accounts', adminsOnly, (request, response, next) => {
         .catch(next)
 })
 
-router.get('/accounts/:accountID', adminsOnly, (request, response, next) => {
+router.get('/accounts/:accountID',  (request, response, next) => {
     const { accountID } = request.params
     const { userID } = request
 
@@ -81,7 +80,7 @@ router.get('/accounts/:accountID', adminsOnly, (request, response, next) => {
         .catch(next)
 })
 
-router.put('/accounts/:accountID', adminsOnly, (request, response, next) => {
+router.put('/accounts/:accountID',  (request, response, next) => {
 	const { accountID } = request.params
     const { body, userID } = request
 
@@ -90,7 +89,7 @@ router.put('/accounts/:accountID', adminsOnly, (request, response, next) => {
         .catch(next)
 })
 
-router.post('/accounts/:accountID/users', adminsOnly, (request, response, next) => {
+router.post('/accounts/:accountID/users',  (request, response, next) => {
     const { name } = request.body
     const { accountID } = request.params
     const { userID } = request
@@ -100,7 +99,7 @@ router.post('/accounts/:accountID/users', adminsOnly, (request, response, next) 
         .catch(next)
 })
 
-router.get('/accounts/:accountID/users', adminsOnly, (request, response, next) => {
+router.get('/accounts/:accountID/users',  (request, response, next) => {
     const { accountID, userID } = request.params
     const adminID = request.userID
 
@@ -115,7 +114,7 @@ router.get('/accounts/:accountID/users', adminsOnly, (request, response, next) =
         .catch(next)
 })
 
-router.get('/accounts/:accountID/users/:userID', adminsOnly, (request, response, next) => {
+router.get('/accounts/:accountID/users/:userID',  (request, response, next) => {
     const { accountID, userID } = request.params
     const adminID = request.userID
 
@@ -134,7 +133,7 @@ router.get('/accounts/:accountID/users/:userID', adminsOnly, (request, response,
         .catch(next)
 })
 
-router.put('/accounts/:accountID/users/:userID', adminsOnly, (request, response, next) => {
+router.put('/accounts/:accountID/users/:userID',  (request, response, next) => {
     const { accountID, userID } = request.params
     const adminID = request.userID
 

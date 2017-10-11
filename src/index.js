@@ -7,7 +7,6 @@ Raven
     .config('https://376b0e70be5d44c6b686dfc6e2759fac:fabee281ea014c37966b9daab78bc2e3@sentry.io/159971')
     .install()
 
-
 const express = require('express')
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
@@ -25,7 +24,7 @@ app.use(require('./router'))
 app.use((error, request, response, next) => {
     Raven.captureException(error)
     const { message, code = 500 } = error
-    response.status(code).json({ message })
+    response.status(code).json({ status: code, message })
 })
 
 app.listen(PORT)
