@@ -7,22 +7,22 @@ function createAccount({ name, author }) {
     return newAccount.save()
 }
 
-async function updateAccount({ userID, accountID, data }) {
+async function updateAccount({ adminID, accountID, data }) {
     if (typeof accountID === 'string') accountID = toObjectId(accountID)
-    if (typeof userID === 'string') userID = toObjectId(userID)
+    if (typeof adminID === 'string') adminID = toObjectId(adminID)
 
-    const admin = await Admin.findOne({ _id: userID })
+    const admin = await Admin.findOne({ _id: adminID })
 
     const query = admin.access === 'partner' ? 
-        { _id: accountID, author: userID } : { _id: accountID }
+        { _id: accountID, author: adminID } : { _id: accountID }
 
     return Account.update(query, data)
 }
 
-async function allAccounts({ userID, query = {} }) {
-    if (typeof userID === 'string') userID = toObjectId(userID)
+async function allAccounts({ adminID, query = {} }) {
+    if (typeof adminID === 'string') adminID = toObjectId(adminID)
 
-    const admin = await Admin.findOne({ _id: userID })
+    const admin = await Admin.findOne({ _id: adminID })
 
     if (admin.access === 'partner') query.author = admin._id
 
@@ -31,13 +31,13 @@ async function allAccounts({ userID, query = {} }) {
     if (accounts && accounts.length > 0) return accounts
 }
 
-async function accountById({ userID, accountID }) {
+async function accountById({ adminID, accountID }) {
     if (typeof accountID === 'string') accountID = toObjectId(accountID)
-    if (typeof userID === 'string') userID = toObjectId(userID)
+    if (typeof adminID === 'string') adminID = toObjectId(adminID)
 
-    const admin = await Admin.findOne({ _id: userID })
+    const admin = await Admin.findOne({ _id: adminID })
     const query = admin.access === 'partner' ? 
-        { _id: accountID, author: userID } : { _id: accountID }
+        { _id: accountID, author: adminID } : { _id: accountID }
             
     return Account.findOne(query, { __v: false })
             .populate('author')

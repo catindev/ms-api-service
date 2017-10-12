@@ -17,7 +17,7 @@ module.exports = (request, response, next) => {
 
     getTokenOwner({ token })
         .then(owner => {
-            request.userID = owner._id
+            request.adminID = owner._id
             next()
         })
         .catch(next)

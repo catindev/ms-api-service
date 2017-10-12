@@ -1,6 +1,7 @@
 const router = require('express').Router()
 const { createAccount, allAccounts, accountById, updateAccount } = require('./queries/accounts')
 const { createUser, userById, allUsers, updateUser, resetPassword } = require('./queries/users')
+const { createTrunk, allTrunks, updateTrunk } = require('./queries/trunks')
 
 // TODO: страничка с доками для авторизованного админа
 router.get('/', (request, response) => response.json({
@@ -36,18 +37,18 @@ router.get('/sessions', (request, response, next) => {
 
 router.post('/accounts', (request, response, next) => {
     const { name } = request.body
-    const { userID } = request
+    const author = request.adminID
 
-    createAccount({ name, author: userID })
+    createAccount({ name, author })
         .then(({ _id }) => response.json({ status: 200, id: _id }))
         .catch(next)
 })
 
 router.get('/accounts',  (request, response, next) => {
     // TODO: потестить на юзере из ЦРМ
-    const { userID } = request
+    const { adminID } = request
 
-    allAccounts({ userID })
+    allAccounts({ adminID })
         .then((items = []) => response.json({ 
             status: 200, 
             items: items.map(({ _id, name }) => ({ id: _id, name })) 
@@ -57,35 +58,35 @@ router.get('/accounts',  (request, response, next) => {
 
 router.get('/accounts/:accountID',  (request, response, next) => {
     const { accountID } = request.params
-    const { userID } = request
+    const { adminID } = request
 
     const moment = require('moment')
     moment.locale('ru')
 
     // TODO: дату создания в ЧПВ
-    accountById({ userID, accountID })
+    accountById({ adminID, accountID })
         .then(account => {
             if (account === null) return response
                 .status(404)
                 .json({ status: 404, message: 'Аккаунт не найден' })
 
-        	const acc = account.toJSON()
-        	const id = acc._id
-        	delete acc._id
+            const acc = account.toJSON()
+            const id = acc._id
+            delete acc._id
 
             acc.author = acc.author.login
             acc.created = moment(acc.created).format('DD MMMM')
 
-        	response.json(Object.assign({ status: 200, id }, acc))
+            response.json(Object.assign({ status: 200, id }, acc))
         })
         .catch(next)
 })
 
 router.put('/accounts/:accountID',  (request, response, next) => {
 	const { accountID } = request.params
-    const { body, userID } = request
+    const { body, adminID } = request
 
-    updateAccount({ userID, accountID, data: body })
+    updateAccount({ adminID, accountID, data: body })
         .then(() => response.json({ status: 200 }))
         .catch(next)
 })
@@ -93,16 +94,16 @@ router.put('/accounts/:accountID',  (request, response, next) => {
 router.post('/accounts/:accountID/users',  (request, response, next) => {
     const { name } = request.body
     const { accountID } = request.params
-    const { userID } = request
+    const { adminID } = request
 
-    createUser({ name, userID, accountID })
+    createUser({ name, adminID, accountID })
         .then(({ _id }) => response.json({ status: 200, id: _id }))
         .catch(next)
 })
 
 router.get('/accounts/:accountID/users',  (request, response, next) => {
     const { accountID, userID } = request.params
-    const adminID = request.userID
+    const { adminID } = request
 
     allUsers({ adminID, userID, accountID })
         .then(items => response.json({ 
@@ -117,7 +118,7 @@ router.get('/accounts/:accountID/users',  (request, response, next) => {
 
 router.get('/accounts/:accountID/users/:userID',  (request, response, next) => {
     const { accountID, userID } = request.params
-    const adminID = request.userID
+    const { adminID } = request
 
     userById({ adminID, userID, accountID })
         .then(user => {
@@ -136,7 +137,7 @@ router.get('/accounts/:accountID/users/:userID',  (request, response, next) => {
 
 router.put('/accounts/:accountID/users/:userID',  (request, response, next) => {
     const { accountID, userID } = request.params
-    const adminID = request.userID
+    const { adminID } = request
 
     updateUser({ adminID, userID, accountID, data: request.body })
         .then(() => response.json({ status: 200 }))
@@ -145,10 +146,56 @@ router.put('/accounts/:accountID/users/:userID',  (request, response, next) => {
 
 router.put('/accounts/:accountID/users/:userID/reset.password',  (request, response, next) => {
     const { accountID, userID } = request.params
-    const adminID = request.userID
+    const { adminID } = request
 
     resetPassword({ adminID, userID, accountID })
         .then( password => response.json({ status: 200, password }))
+        .catch(next)
+})
+
+router.post('/accounts/:accountID/trunks',  (request, response, next) => {
+    const { name, phone } = request.body
+    const { accountID } = request.params
+    const { adminID } = request
+
+    if (!name) return response.status(400).json({
+        status:400,
+        message: "Не заполнено название транка",
+        fields: [ "name" ]
+    })
+
+    if (!phone) return response.status(400).json({
+        status:400,
+        message: "Не заполнен номер транка",
+        fields: [ "phone" ]
+    })
+
+    createTrunk({ name, phone, adminID, accountID })
+        .then(({ _id }) => response.json({ status: 200, id: _id }))
+        .catch(next)
+})
+
+router.get('/accounts/:accountID/trunks',  (request, response, next) => {
+    const { accountID } = request.params
+    const { adminID } = request
+
+    allTrunks({ adminID, accountID })
+        .then((items = []) => response.json({ 
+            status: 200, 
+            items: items ? 
+                items.map(({ _id, name, phone, active }) => ({ id: _id, name, phone, active })) 
+                :
+                []
+        }))
+        .catch(next)
+})
+
+router.put('/accounts/:accountID/trunks/:trunkID',  (request, response, next) => {
+    const { accountID, trunkID } = request.params
+    const { adminID, body } = request
+
+    updateTrunk({ adminID, trunkID, accountID, data: body })
+        .then(() => response.json({ status: 200 }))
         .catch(next)
 })
 

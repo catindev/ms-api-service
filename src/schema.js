@@ -3,7 +3,7 @@ const { Schema } = mongoose
 const { ObjectId } = Schema.Types
 const md5 = require('./utils/md5')
 
-function hidePassword( next ) {
+function hidePassword(next) {
     if (!this.isModified('password')) return next()
     this.password = md5(`${this.password}wow! much salt!`)
     next()
@@ -40,7 +40,7 @@ const AdminSchema = new Schema({
         type: String,
         required: true
     },
- 	access:{ type: String, enum: ['boss', 'manager'], default: 'admin',  },
+    access: { type: String, enum: ['boss', 'manager'], default: 'admin', },
     created: { type: Date, default: Date.now() }
 })
 AdminSchema.pre('save', hidePassword)
@@ -49,7 +49,7 @@ const Admin = mongoose.model('Admin', AdminSchema)
 
 const Session = mongoose.model('Session', new Schema({
     user: { type: ObjectId, ref: 'User' },
-    admin: { type: ObjectId, ref: 'Admin' },    
+    admin: { type: ObjectId, ref: 'Admin' },
     token: String,
     created: { type: Date, default: Date.now() }
 }))
@@ -69,6 +69,19 @@ UserSchema.pre('save', hidePassword)
 const User = mongoose.model('User', UserSchema)
 
 
+const Trunk = mongoose.model('Trunk', new Schema({
+    account: { type: ObjectId, ref: 'Account' },
+    phone: String,
+    name: String,
+    active: { type: Boolean, default: false },
+}))
+
+
 module.exports = {
-	Log, Admin, Account, Session, User
+    Log,
+    Admin,
+    Account,
+    Session,
+    User,
+    Trunk
 }

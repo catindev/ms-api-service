@@ -4,9 +4,9 @@ const { haveAccessToAccount } = require('./accounts')
 const CustomError = require('../utils/error')
 const md5 = require('../utils/md5')
 
-async function createUser({ accountID, userID, name }) {
+async function createUser({ accountID, adminID, name }) {
     if (typeof accountID === 'string') accountID = toObjectId(accountID)
-    if (typeof userID === 'string') userID = toObjectId(userID)
+    if (typeof adminID === 'string') adminID = toObjectId(adminID)
 
     const canCreate = await haveAccessToAccount({ admin: userID, account: accountID })
     if (canCreate === false)
