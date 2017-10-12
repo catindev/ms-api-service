@@ -1,7 +1,8 @@
 const toObjectId = require('mongoose').Types.ObjectId
-const { Admin, User, Account } = require('../schema')
+const { Admin, User, Account, Session } = require('../schema')
 const { haveAccessToAccount } = require('./accounts')
 const CustomError = require('../utils/error')
+const md5 = require('../utils/md5')
 
 async function createUser({ accountID, userID, name }) {
     if (typeof accountID === 'string') accountID = toObjectId(accountID)
@@ -80,9 +81,9 @@ async function resetPassword({ adminID, accountID, userID }) {
     const password = generateNewPassword()
 
     const update = await User.update({ _id: userID }, { password: md5(`${ password }wow! much salt!`) })
-    const logout = await Session.findOne({ admin: adminID }).remove().exec()  
+    const logout = await Session.findOne({ user: userID }).remove().exec()  
 
     return password
 }
 
-module.exports = { createUser, userById, allUsers, updateUser }
+module.exports = { createUser, userById, allUsers, updateUser, resetPassword }

@@ -1,6 +1,6 @@
 const router = require('express').Router()
 const { createAccount, allAccounts, accountById, updateAccount } = require('./queries/accounts')
-const { createUser, userById, allUsers, updateUser } = require('./queries/users')
+const { createUser, userById, allUsers, updateUser, resetPassword } = require('./queries/users')
 
 // TODO: страничка с доками для авторизованного админа
 router.get('/', (request, response) => response.json({
@@ -140,6 +140,15 @@ router.put('/accounts/:accountID/users/:userID',  (request, response, next) => {
 
     updateUser({ adminID, userID, accountID, data: request.body })
         .then(() => response.json({ status: 200 }))
+        .catch(next)
+})
+
+router.put('/accounts/:accountID/users/:userID/reset.password',  (request, response, next) => {
+    const { accountID, userID } = request.params
+    const adminID = request.userID
+
+    resetPassword({ adminID, userID, accountID })
+        .then( password => response.json({ status: 200, password }))
         .catch(next)
 })
 
