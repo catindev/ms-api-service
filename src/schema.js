@@ -2,6 +2,7 @@ const mongoose = require('mongoose')
 const { Schema } = mongoose
 const { ObjectId } = Schema.Types
 const md5 = require('./utils/md5')
+const transliterate = require('./utils/transliterate')
 
 function hidePassword(next) {
     if (!this.isModified('password')) return next()
@@ -77,11 +78,28 @@ const Trunk = mongoose.model('Trunk', new Schema({
 }))
 
 
+const ParamSchema = new Schema({
+    account: { type: ObjectId, ref: 'Account' },
+    name: String,
+    id: String,
+    type: { type: String, enum: ['text', 'select', 'multiselect'], default: 'text' },
+    items: [String],
+    description: String
+})
+ParamSchema.pre('save', function (next) {
+    if (!this.isModified('id')) return next()
+    this.id = transliterate(this.name)
+    next()
+})
+const Param = mongoose.model('Param', ParamSchema)
+
+
 module.exports = {
     Log,
     Admin,
     Account,
     Session,
     User,
-    Trunk
+    Trunk,
+    Param
 }
