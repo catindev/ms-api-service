@@ -41,7 +41,7 @@ const AdminSchema = new Schema({
         type: String,
         required: true
     },
-    access: { type: String, enum: ['boss', 'manager'], default: 'admin', },
+    access: { type: String, enum: ['admin', 'partner'], default: 'admin', },
     created: { type: Date, default: Date.now() }
 })
 AdminSchema.pre('save', hidePassword)
