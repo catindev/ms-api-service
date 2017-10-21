@@ -11,7 +11,7 @@ function hidePassword(next) {
 }
 
 const Log = mongoose.model('Log', new Schema({
-    level: String,
+    type: String,
     who: { type: ObjectId, ref: 'Session' },
     when: { type: Date, expires: 1209600, default: Date.now() },
     what: String,
@@ -87,7 +87,7 @@ const ParamSchema = new Schema({
     description: String
 })
 ParamSchema.pre('save', function (next) {
-    if (!this.isModified('id')) return next()
+    if (!this.isModified('id') && this.id) return next()
     this.id = transliterate(this.name)
     next()
 })

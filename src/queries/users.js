@@ -3,6 +3,7 @@ const { Admin, User, Account, Session } = require('../schema')
 const { haveAccessToAccount } = require('./accounts')
 const CustomError = require('../utils/error')
 const md5 = require('../utils/md5')
+const formatNumber = require('../utils/formatNumber')
 
 async function createUser({ accountID, adminID, name }) {
     if (typeof accountID === 'string') accountID = toObjectId(accountID)
@@ -50,6 +51,8 @@ async function updateUser({ adminID, accountID, userID, data }) {
     const canUpdate = await haveAccessToAccount({ admin: adminID, account: accountID })  
     if (canUpdate === false)
         throw new CustomError('У вас недостаточно прав доступа для этого действия', 403)
+
+    if ('phones' in data) data.phones = data.phones.map(formatNumber)
 
     return User.update({ _id: userID }, data)
 }
