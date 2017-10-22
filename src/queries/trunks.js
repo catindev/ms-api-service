@@ -3,6 +3,7 @@ const { Trunk, Admin, User, Account, Session } = require('../schema')
 const { haveAccessToAccount } = require('./accounts')
 const CustomError = require('../utils/error')
 const md5 = require('../utils/md5')
+const formatNumber = require('../utils/formatNumber')
 
 async function createTrunk({ accountID, adminID, name, phone }) {
     if (typeof accountID === 'string') accountID = toObjectId(accountID)
