@@ -24,7 +24,8 @@ const Account = mongoose.model('Account', new Schema({
     maxWaitingTime: { type: Number, default: 12000 },
     maxConversationTime: { type: Number, default: 120000 },
     funnelSteps: [String],
-    noTargetReasons: { type: [String], default: ['Другое', 'Ошиблись номером'] },
+    noTargetReasons: { type: [String], default: ['Другое', 'Ошиблись номером', 'Клиент не отвечает'] },
+    rejectReasons: { type: [String], default: ['Другое', 'Дорого'] },
     targetQuestion: { type: String, default: 'Клиент интересовался услугами вашей компании?' },
     author: { type: ObjectId, ref: 'Admin' },
     created: { type: Date, default: Date.now() }

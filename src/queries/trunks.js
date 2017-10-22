@@ -38,6 +38,8 @@ async function updateTrunk({ adminID, accountID, trunkID, data }) {
     if (canUpdate === false)
         throw new CustomError('У вас недостаточно прав доступа для этого действия', 403)
 
+    if ('phone' in data) data.phone = formatNumber(data.phone)
+
     return Trunk.update({ _id: trunkID }, data)
 }
 
