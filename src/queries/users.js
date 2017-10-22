@@ -9,7 +9,7 @@ async function createUser({ accountID, adminID, name }) {
     if (typeof accountID === 'string') accountID = toObjectId(accountID)
     if (typeof adminID === 'string') adminID = toObjectId(adminID)
 
-    const canCreate = await haveAccessToAccount({ admin: userID, account: accountID })
+    const canCreate = await haveAccessToAccount({ admin: adminID, account: accountID })
     if (canCreate === false)
         throw new CustomError('У вас недостаточно прав доступа для этого действия', 403)
 
