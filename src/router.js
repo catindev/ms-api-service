@@ -135,14 +135,6 @@ router.put('/accounts/:accountID/users/:userID',  (request, response, next) => {
         .catch(next)
 })
 
-router.put('/accounts/:accountID/users/:userID/reset.password',  (request, response, next) => {
-    const { adminID, params: { accountID, userID } } = request
-
-    resetPassword({ adminID, userID, accountID })
-        .then( password => response.json({ status: 200, password }))
-        .catch(next)
-})
-
 router.post('/accounts/:accountID/trunks',  (request, response, next) => {
     const { adminID, params: { accountID }, body: { name, phone} } = request
 

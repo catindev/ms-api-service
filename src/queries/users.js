@@ -58,35 +58,4 @@ async function updateUser({ adminID, accountID, userID, data }) {
 }
 
 
-async function resetPassword({ adminID, accountID, userID }) {
-    
-    function generateNewPassword() {
-      const length = 8,
-        charset = 'abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-
-      let newPassword = '';
-
-      for (let i = 0, n = charset.length; i < length; ++i) {
-        newPassword += charset.charAt(Math.floor(Math.random() * n));
-      }
-
-      return newPassword;
-    }
-
-    if (typeof accountID === 'string') accountID = toObjectId(accountID)
-    if (typeof userID === 'string') userID = toObjectId(userID)
-    if (typeof adminID === 'string') adminID = toObjectId(adminID)
-
-    const canUpdate = await haveAccessToAccount({ admin: adminID, account: accountID })  
-    if (canUpdate === false)
-        throw new CustomError('У вас недостаточно прав доступа для этого действия', 403)
-
-    const password = generateNewPassword()
-
-    const update = await User.update({ _id: userID }, { password: md5(`${ password }wow! much salt!`) })
-    const logout = await Session.findOne({ user: userID }).remove().exec()  
-
-    return password
-}
-
-module.exports = { createUser, userById, allUsers, updateUser, resetPassword }
+module.exports = { createUser, userById, allUsers, updateUser }
