@@ -52,7 +52,11 @@ async function updateUser({ adminID, accountID, userID, data }) {
     if (canUpdate === false)
         throw new CustomError('У вас недостаточно прав доступа для этого действия', 403)
 
-    if ('phones' in data) data.phones = data.phones.map(formatNumber)
+    if ('phones' in data) {
+        data.phones = data.phones.map(formatNumber)
+        const users = await User.find({ phones: { $in: data.phones } })
+        if (users && user.length > 0) throw new CustomError('Номер уже используется одним из менеджеров', 400)        
+    }
 
     return User.update({ _id: userID }, data)
 }
