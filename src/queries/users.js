@@ -54,8 +54,8 @@ async function updateUser({ adminID, accountID, userID, data }) {
 
     if ('phones' in data) {
         data.phones = data.phones.map(formatNumber)
-        const users = await User.find({ phones: { $in: data.phones } })
-        if (users && users.length > 0) throw new CustomError('Номер уже используется одним из менеджеров', 400)        
+        // const users = await User.find({ phones: { $in: data.phones } })
+        // if (users && users.length > 0) throw new CustomError('Номер уже используется одним из менеджеров', 400)        
     }
 
     return User.update({ _id: userID }, data)
