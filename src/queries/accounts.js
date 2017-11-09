@@ -26,7 +26,7 @@ async function allAccounts({ adminID, query = {} }) {
 
     if (admin.access === 'partner') query.author = admin._id
 
-    const accounts = await Account.find(query, { name: 1 })
+    const accounts = await Account.find(query, { name: 1 }).populate('author').exec()
 
     if (accounts && accounts.length > 0) return accounts
 }
