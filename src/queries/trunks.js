@@ -1,5 +1,5 @@
 const toObjectId = require('mongoose').Types.ObjectId
-const { Trunk, Admin, User, Account, Session } = require('../schema')
+const { Trunk, Admin, User, Account, Session, Customer } = require('../schema')
 const { haveAccessToAccount } = require('./accounts')
 const CustomError = require('../utils/error')
 const md5 = require('../utils/md5')
@@ -44,4 +44,23 @@ async function updateTrunk({ adminID, accountID, trunkID, data }) {
     return Trunk.update({ _id: trunkID }, data)
 }
 
-module.exports = { createTrunk, allTrunks, updateTrunk }
+
+async function trunksLeadsStats({ adminID, accountID, }) {
+  if (typeof accountID === 'string') accountID = toObjectId(accountID)
+  if (typeof adminID === 'string') adminID = toObjectId(adminID)    
+  const results = []  
+
+    const canView = await haveAccessToAccount({ admin: adminID, account: accountID })  
+    if (canView === false)
+        throw new CustomError('У вас недостаточно прав доступа для просмотра данных', 403)
+
+  const trunks = await Trunk.find({ account: accountID })
+  
+  for (let trunk of trunks) {
+    const customers = await Customer.find({ trunk: trunk._id }).count()
+    if (customers && customers > 0) results.push({ name: trunk.name, customers })
+  }
+
+  return results
+}
+module.exports = { createTrunk, allTrunks, updateTrunk, trunksLeadsStats }

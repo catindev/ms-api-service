@@ -88,6 +88,32 @@ ParamSchema.pre('save', function (next) {
 })
 const Param = mongoose.model('Param', ParamSchema)
 
+const Customer = mongoose.model('Customer', new Schema({
+    account: { type: ObjectId, ref: 'Account' },
+    trunk: { type: ObjectId, ref: 'Trunk' },
+    user: { type: ObjectId, ref: 'User' },
+    created: { type: Date, default: Date.now() },
+    lastUpdate: { type: Date, default: new Date() },
+    lastActivity: String,
+    name: String,
+    details: String,
+    phones: [String],
+    notes: String,
+    funnelStep: String, // lead || cold, in-progress, ...custom, deal || reject
+    deal: {
+        amount: Number,
+        comment: String,
+        previousStep: String,
+        date: Date
+    },
+    reject: {
+        reason: String,
+        comment: String,
+        previousStep: String,
+        date: Date
+    }
+}, { strict: false }))
+
 
 module.exports = {
     Log,
@@ -96,5 +122,6 @@ module.exports = {
     Session,
     User,
     Trunk,
-    Param
+    Param,
+    Customer
 }

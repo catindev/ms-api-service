@@ -2,7 +2,7 @@ const router = require('express').Router()
 const { getTokenOwner, SignIn } = require('./queries/sessions')
 const { createAccount, allAccounts, accountById, updateAccount } = require('./queries/accounts')
 const { createUser, userById, allUsers, updateUser, resetPassword, addPhoneNumber, removePhoneNumber, editPhoneNumber } = require('./queries/users')
-const { createTrunk, allTrunks, updateTrunk } = require('./queries/trunks')
+const { createTrunk, allTrunks, updateTrunk, trunksLeadsStats } = require('./queries/trunks')
 const { createParam, paramById, allParams, updateParam } = require('./queries/params')
 
 // TODO: страничка с доками для авторизованного админа
@@ -154,6 +154,15 @@ router.put('/accounts/:accountID/users/:userID/edit.number', (request, response,
 
     editPhoneNumber({ adminID, userID, accountID, number, newNumber })
         .then(number => response.json({ status: 200, number }))
+        .catch(next)
+})
+
+
+router.get('/accounts/:accountID/trunks/stats', (request, response, next) => {
+    const { adminID, params: { accountID } } = request
+
+    trunksLeadsStats({ adminID, accountID })
+        .then((stats = []) => response.json({ status: 200, stats }))
         .catch(next)
 })
 
